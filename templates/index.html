@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DJ Taste Engine</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --green: #1DB954;
+      --green-light: #1ed760;
+      --black: #000000;
+      --dark: #121212;
+      --card: #181818;
+      --card2: #282828;
+      --gray: #B3B3B3;
+      --white: #FFFFFF;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.3s;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo img {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+    }
+    .nav-logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.3px;
+    }
+    .nav-logo-text span { color: var(--green); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-links a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--green);
+      color: var(--black) !important;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+    }
+    .nav-cta:hover { background: var(--green-light) !important; color: var(--black) !important; }
+
+    /* TICKER */
+    .ticker-wrap {
+      position: fixed;
+      top: 64px;
+      left: 0; right: 0;
+      z-index: 99;
+      background: var(--green);
+      overflow: hidden;
+      height: 36px;
+      display: flex;
+      align-items: center;
+    }
+    .ticker-label {
+      background: var(--black);
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 0 16px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      z-index: 2;
+      text-transform: uppercase;
+    }
+    .ticker-track {
+      display: flex;
+      animation: ticker 40s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 32px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--black);
+    }
+    .ticker-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.4);
+    }
+    .ticker-artist { opacity: 0.65; font-weight: 500; }
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      padding-top: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(29,185,84,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb1 {
+      width: 400px; height: 400px;
+      background: rgba(29,185,84,0.08);
+      top: 10%; left: 10%;
+      animation-delay: 0s;
+    }
+    .orb2 {
+      width: 300px; height: 300px;
+      background: rgba(29,185,84,0.06);
+      top: 30%; right: 5%;
+      animation-delay: -3s;
+    }
+    .orb3 {
+      width: 200px; height: 200px;
+      background: rgba(29,185,84,0.05);
+      bottom: 20%; left: 30%;
+      animation-delay: -6s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(29,185,84,0.12);
+      border: 1px solid rgba(29,185,84,0.3);
+      border-radius: 50px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+      margin-bottom: 28px;
+      letter-spacing: 0.5px;
+      position: relative; z-index: 1;
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 80px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+      max-width: 900px;
+      position: relative; z-index: 1;
+    }
+    .hero h1 .green { color: var(--green); }
+    .hero h1 .dim { color: rgba(255,255,255,0.4); }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--gray);
+      max-width: 520px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+      font-weight: 400;
+      position: relative; z-index: 1;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 80px;
+      position: relative; z-index: 1;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: var(--black);
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: var(--green-light);
+      transform: scale(1.03);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--white);
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--white); }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex;
+      gap: 48px;
+      padding: 24px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      width: 100%;
+      max-width: 700px;
+      justify-content: center;
+      position: relative; z-index: 1;
+    }
+    .stat-item { text-align: center; }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -1px;
+    }
+    .stat-value span { color: var(--green); }
+    .stat-label {
+      font-size: 11px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 32px;
+    }
+    .section-header h2 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .section-header h2 span { color: var(--green); }
+    .view-all {
+      font-size: 13px;
+      color: var(--green);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .view-all:hover { text-decoration: underline; }
+
+    /* TOP TRACKS CARDS */
+    .tracks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+.track-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--white);
+}
+.track-row:hover { background: rgba(255,255,255,0.06); }
+.track-row img {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.track-row .img-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--card2);
+  flex-shrink: 0;
+}
+.track-row-info { flex: 1; min-width: 0; }
+.track-row-name {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.track-row-artist {
+  font-size: 12px;
+  color: var(--gray);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.track-row-more {
+  font-size: 18px;
+  color: #444;
+  padding: 0 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.track-row:hover .track-row-more { opacity: 1; }
+
+    /* FEATURE BLOCKS */
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid rgba(255,255,255,0.06);
+      text-decoration: none;
+      color: var(--white);
+      transition: all 0.25s;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card:hover { background: #1e1e1e; transform: translateY(-4px); }
+    .feature-card .icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .feature-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .feature-link {
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feature-bg-text {
+      position: absolute;
+      bottom: -20px;
+      right: -10px;
+      font-size: 100px;
+      opacity: 0.04;
+      font-weight: 900;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* FOOTER */
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 32px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-logo img { width: 28px; height: 28px; border-radius: 4px; }
+    .footer p { font-size: 13px; color: var(--gray); }
+
+    /* REFRESH BTN */
+    .refresh-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: var(--card2);
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50px;
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      z-index: 50;
+      font-family: 'Inter', sans-serif;
+    }
+    .refresh-btn:hover { background: #333; border-color: var(--green); color: var(--green); }
+    .refresh-btn.loading .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .refresh-status {
+      position: fixed;
+      bottom: 80px;
+      right: 32px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .refresh-status.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="/" class="nav-logo">
+    <img src="/static/logo.png" alt="Logo">
+    <span class="nav-logo-text">DJ <span>Taste Engine</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/queue">DJ Queue</a>
+    <a href="/dashboard" class="nav-cta">Open App</a>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">🎵 Now Trending</div>
+  <div class="ticker-track" id="ticker-track">
+    <div class="ticker-item">Loading your tracks...</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+    <canvas id="visualizer" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.15;pointer-events:none;z-index:0;"></canvas>
+  <div class="hero-bg"></div>
+  <div class="orb hero-orb orb1"></div>
+  <div class="orb hero-orb orb2"></div>
+  <div class="orb hero-orb orb3"></div>
+
+  <div class="hero-badge">
+    <div class="badge-dot"></div>
+    Powered by your real Spotify data
+  </div>
+
+  <h1>
+    Your music.<br>
+    <span class="green">Intelligently</span> curated.<br>
+    <span class="dim">Like a real DJ.</span>
+  </h1>
+
+  <p class="hero-sub">
+    DJ Taste Engine analyzes how your taste shifts over time and builds DJ-style queues that actually match where your head is at — right now.
+  </p>
+
+  <div class="hero-actions">
+    <a href="/queue" class="btn-primary">Generate My Queue</a>
+    <a href="/dashboard" class="btn-secondary">View Dashboard</a>
+  </div>
+
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value" id="stat-tracks"><span>—</span></div>
+      <div class="stat-label">Tracks Analyzed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="stat-artists"><span>—</span></div>
+      <div class="stat-label">Unique Artists</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="stat-peak"><span>—</span></div>
+      <div class="stat-label">Peak Listening Hour</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOP TRACKS -->
+<!-- TOP 10 SECTION -->
+<div style="padding: 0 40px 80px; max-width: 1200px; margin: 0 auto;">
+  <div class="section-header" style="margin-bottom: 24px;">
+    <h2>Your Top 10 <span>Right Now</span></h2>
+    <a href="/dashboard" class="view-all">See full dashboard →</a>
+  </div>
+
+  <div style="
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  ">
+    <div class="tracks-grid" id="tracks-grid">
+      <div style="color:#535353;font-size:14px;padding:20px;">Loading...</div>
+    </div>
+  </div>
+</div>
+<!-- FEATURES -->
+<div class="section" style="padding-top: 0;">
+  <div class="section-header">
+    <h2>Explore the <span>Engine</span></h2>
+  </div>
+  <div class="features-grid">
+  <a href="/dashboard" class="feature-card" style="overflow:hidden;position:relative;">
+  <video
+    autoplay muted loop playsinline
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.18;z-index:0;border-radius:16px;">
+    <source src="/static/dash.mp4" type="video/mp4">
+  </video>
+  <div style="position:relative;z-index:1;">
+    <span class="icon">
+      <i data-lucide="bar-chart-2" style="width:32px;height:32px;stroke:#1DB954;stroke-width:1.5;"></i>
+    </span>
+    <h3>Taste Dashboard</h3>
+    <p>See your listening patterns visualized — most played artists, peak hours, taste drift across time windows.</p>
+    <div class="feature-link">
+      Open Dashboard
+      <i data-lucide="arrow-right" style="width:14px;height:14px;stroke:#1DB954;"></i>
+    </div>
+    <div class="feature-bg-text">DASH</div>
+  </div>
+</a>
+  <a href="/queue" class="feature-card" style="overflow:hidden;position:relative;">
+  <video
+    autoplay muted loop playsinline
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.18;z-index:0;border-radius:16px;">
+    <source src="/static/bg.mp4" type="video/mp4">
+  </video>
+  <div style="position:relative;z-index:1;">
+    <span class="icon">
+      <i data-lucide="headphones" style="width:32px;height:32px;stroke:#1DB954;stroke-width:1.5;"></i>
+    </span>
+    <h3>DJ Queue Generator</h3>
+    <p>Generate a 20-track set structured like a real DJ — warmup, build, peak, cooldown — scored by your current taste.</p>
+    <div class="feature-link">
+      Generate Queue
+      <i data-lucide="arrow-right" style="width:14px;height:14px;stroke:#1DB954;"></i>
+    </div>
+    <div class="feature-bg-text">DJ</div>
+  </div>
+</a>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">
+    <img src="/static/logo.png" alt="Logo">
+    <span style="font-size:14px; font-weight:700;">DJ Taste Engine</span>
+  </div>
+  <p>Built by Edwin Silayo · Powered by Spotify</p>
+</footer>
+
+<!-- REFRESH BUTTON -->
+<button class="refresh-btn" onclick="refreshData()" id="refresh-btn">
+  <span class="spin">↻</span> Refresh Data
+</button>
+<div class="refresh-status" id="refresh-status">✓ Data refreshed</div>
+
+<script>
+  async function loadHome() {
+    const res = await fetch('/api/dashboard');
+    const data = await res.json();
+
+    // Stats
+    const totalTracks = data.top_artists.values.reduce((a,b) => a+b, 0);
+    const uniqueArtists = data.top_artists.labels.length;
+    const peakHour = data.hour_counts.labels[data.hour_counts.values.indexOf(Math.max(...data.hour_counts.values))];
+    document.getElementById('stat-tracks').innerHTML = `<span>${totalTracks}</span>`;
+    document.getElementById('stat-artists').innerHTML = `<span>${uniqueArtists}</span>+`;
+    document.getElementById('stat-peak').innerHTML = `<span>${peakHour}:00</span>`;
+
+    // Top 3 tracks
+    const top10 = data.top10.slice(0, 10);
+document.getElementById('tracks-grid').innerHTML = top10.map((t) => `
+  <a class="track-row" href="https://open.spotify.com/track/${t.track_id}" target="_blank">
+    ${t.album_image
+      ? `<img src="${t.album_image}" alt="${t.track_name}">`
+      : `<div class="img-placeholder"></div>`}
+    <div class="track-row-info">
+      <div class="track-row-name">${t.track_name}</div>
+      <div class="track-row-artist">${t.artist}</div>
+    </div>
+    <span class="track-row-more">···</span>
+  </a>
+`).join('');
+
+    // Ticker
+    const allTracks = data.top10;
+    const items = allTracks.map(t =>
+      `<div class="ticker-item">
+        <span>${t.track_name}</span>
+        <span class="ticker-artist">— ${t.artist}</span>
+        <span class="ticker-dot"></span>
+      </div>`
+    ).join('');
+    // Duplicate for seamless loop
+    document.getElementById('ticker-track').innerHTML = items + items;
+  }
+
+  async function refreshData() {
+    const btn = document.getElementById('refresh-btn');
+    const status = document.getElementById('refresh-status');
+    btn.classList.add('loading');
+    const res = await fetch('/api/refresh');
+    const data = await res.json();
+    btn.classList.remove('loading');
+    if (data.status === 'success') {
+      status.classList.add('show');
+      setTimeout(() => status.classList.remove('show'), 3000);
+      loadHome();
+    }
+  }
+
+  loadHome();
+  // Live audio visualizer background
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const bars = 80;
+const heights = Array.from({length: bars}, () => Math.random() * 40 + 10);
+const speeds = Array.from({length: bars}, () => 0.02 + Math.random() * 0.03);
+const offsets = Array.from({length: bars}, (_, i) => i * 0.4);
+
+function drawVisualizer(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const barWidth = canvas.width / bars;
+  const centerY = canvas.height * 0.75;
+
+  for (let i = 0; i < bars; i++) {
+    const h = heights[i] * (0.5 + 0.5 * Math.sin(t * speeds[i] + offsets[i])) * 2.5;
+    const x = i * barWidth;
+    const alpha = 0.4 + 0.6 * (h / (heights[i] * 2.5));
+
+    // Main bar
+    ctx.fillStyle = `rgba(29, 185, 84, ${alpha})`;
+    ctx.beginPath();
+    ctx.roundRect(x + 1, centerY - h, barWidth - 3, h, 2);
+    ctx.fill();
+
+    // Mirror below
+    ctx.fillStyle = `rgba(29, 185, 84, ${alpha * 0.3})`;
+    ctx.beginPath();
+    ctx.roundRect(x + 1, centerY, barWidth - 3, h * 0.4, 2);
+    ctx.fill();
+  }
+
+  requestAnimationFrame(drawVisualizer);
+}
+
+requestAnimationFrame(drawVisualizer);
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</body>
+</html>

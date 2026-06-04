@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · DJ Taste Engine</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --green:#1DB954; --green-light:#1ed760; --black:#000; --dark:#121212; --card:#181818; --card2:#282828; --gray:#B3B3B3; --white:#fff; }
+    body { background: var(--dark); color: var(--white); font-family: 'Inter', sans-serif; }
+
+    .navbar { background: #000; padding: 0 40px; height: 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 100; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { width: 32px; height: 32px; border-radius: 6px; }
+    .nav-logo-text { font-size: 15px; font-weight: 700; color: var(--white); }
+    .nav-logo-text span { color: var(--green); }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: var(--gray); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .btn-sm { background: var(--green); color: var(--black) !important; padding: 7px 18px; border-radius: 50px; font-weight: 700 !important; font-size: 13px !important; }
+
+    .page-header { padding: 40px 40px 0; }
+    .page-header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; }
+    .page-header h1 span { color: var(--green); }
+    .page-header p { color: var(--gray); font-size: 14px; margin-top: 6px; }
+
+    .container { padding: 32px 40px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+    .card { background: var(--card); border-radius: 12px; padding: 24px; border: 1px solid rgba(255,255,255,0.05); }
+    .card h3 { font-size: 11px; color: var(--gray); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+    .chart-wrap { position: relative; height: 220px; }
+
+    .top10-list { list-style: none; }
+    .top10-list li { display: flex; align-items: center; gap: 12px; padding: 8px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); border-radius: 8px; transition: background 0.15s; }
+    .top10-list li:hover { background: rgba(255,255,255,0.04); }
+    .top10-list li:last-child { border-bottom: none; }
+    .top10-list li:last-child { border-bottom: none; }
+    .rank { font-size: 12px; color: #535353; width: 20px; text-align: right; font-weight: 700; }
+    .track-info .name { font-size: 14px; font-weight: 600; }
+    .track-info .artist { font-size: 12px; color: var(--gray); }
+
+    .scored-list { list-style: none; }
+    .scored-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .scored-list li:last-child { border-bottom: none; }
+    .score-pill { background: var(--green); color: var(--black); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 50px; }
+
+    .refresh-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .btn-refresh { background: var(--card2); color: var(--white); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; padding: 9px 20px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+    .btn-refresh:hover { border-color: var(--green); color: var(--green); }
+    .status { font-size: 12px; color: var(--green); }
+
+    .drift-list { list-style: none; }
+.drift-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.drift-list li:hover { background: rgba(255,255,255,0.04); }
+.drift-list li:last-child { border-bottom: none; }
+.drift-arrow {
+  font-size: 22px;
+  font-weight: 900;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.drift-change {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 50px;
+  flex-shrink: 0;
+  min-width: 36px;
+  text-align: center;
+}
+.drift-up { color: #1DB954; }
+.drift-down { color: #e74c3c; }
+.drift-change-up { background: rgba(29,185,84,0.12); color: #1DB954; }
+.drift-change-down { background: rgba(231,76,60,0.12); color: #e74c3c; }
+.drift-neutral { color: #535353; }
+.drift-change-neutral { background: rgba(255,255,255,0.06); color: #535353; }
+
+.drift-item { position: relative; }
+.drift-tooltip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  width: 220px;
+  z-index: 50;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  pointer-events: none;
+}
+.drift-item:hover .drift-tooltip { display: block; }
+.tooltip-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.tooltip-label { color: #B3B3B3; }
+.tooltip-value { color: #fff; font-weight: 600; }
+.tooltip-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+.badge-recent { background: rgba(29,185,84,0.15); color: #1DB954; }
+.badge-longterm { background: rgba(52,152,219,0.15); color: #3498db; }
+.badge-fading { background: rgba(243,156,18,0.15); color: #f39c12; }
+.badge-deep { background: rgba(255,255,255,0.08); color: #B3B3B3; }
+
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">
+    <img src="/static/logo.png" alt="Logo">
+    <span class="nav-logo-text">DJ <span>Taste Engine</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/dashboard" class="active">Dashboard</a>
+    <a href="/queue">DJ Queue</a>
+    <a href="/queue" class="btn-sm">Generate Queue</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Taste <span>Dashboard</span></h1>
+  <p>Your listening patterns and music identity — updated from your real Spotify data.</p>
+</div>
+
+<div class="container">
+  <div class="refresh-bar">
+    <button class="btn-refresh" onclick="refreshData()">↻ Refresh Data</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <div class="grid-3">
+    <div class="card"><h3>Most Played Artists</h3><div class="chart-wrap"><canvas id="artistChart"></canvas></div></div>
+    <div class="card"><h3>Listening by Hour</h3><div class="chart-wrap"><canvas id="hourChart"></canvas></div></div>
+    <div class="card"><h3>Listening by Day</h3><div class="chart-wrap"><canvas id="dayChart"></canvas></div></div>
+  </div>
+
+  <div class="grid-2">
+   <div class="card">
+  <h3>Taste Drift — Rising vs Falling</h3>
+  <ul class="drift-list" id="drift-list">
+    <li style="color:#535353;font-size:14px;">Loading...</li>
+  </ul>
+</div>
+    <div class="card"><h3>Top 10 Right Now</h3><ul class="top10-list" id="top10"></ul></div>
+  </div>
+
+  <div class="card">
+    <h3>Top Scored Tracks</h3>
+    <ul class="scored-list" id="scored"></ul>
+  </div>
+</div>
+
+<script>
+  let charts = {};
+  function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+  async function loadDashboard() {
+    const res = await fetch('/api/dashboard');
+    const d = await res.json();
+
+    destroyChart('a');
+    charts['a'] = new Chart(document.getElementById('artistChart'), {
+      type: 'bar',
+      data: { labels: d.top_artists.labels.slice().reverse(), datasets: [{ data: d.top_artists.values.slice().reverse(), backgroundColor: '#1DB954', borderRadius: 4 }] },
+      options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#B3B3B3', font:{size:10} }, grid: { color: '#222' } }, y: { ticks: { color: '#fff', font:{size:10} }, grid: { display: false } } } }
+    });
+
+    destroyChart('h');
+    charts['h'] = new Chart(document.getElementById('hourChart'), {
+      type: 'bar',
+      data: { labels: d.hour_counts.labels, datasets: [{ data: d.hour_counts.values, backgroundColor: d.hour_counts.values.map(v => v === Math.max(...d.hour_counts.values) ? '#1DB954' : '#333'), borderRadius: 3 }] },
+      options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#B3B3B3', font:{size:9} }, grid: { display: false } }, y: { ticks: { color: '#B3B3B3', font:{size:9} }, grid: { color: '#222' } } } }
+    });
+
+    destroyChart('day');
+    charts['day'] = new Chart(document.getElementById('dayChart'), {
+      type: 'bar',
+      data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ data: d.day_counts.values, backgroundColor: d.day_counts.values.map(v => v === Math.max(...d.day_counts.values) ? '#1DB954' : '#333'), borderRadius: 3 }] },
+      options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#B3B3B3', font:{size:10} }, grid: { display: false } }, y: { ticks: { color: '#B3B3B3', font:{size:9} }, grid: { color: '#222' } } } }
+    });
+
+   document.getElementById('drift-list').innerHTML = d.drift.map(t => {
+  const up = t.change > 0;
+  const neutral = t.change === 0;
+  const arrow = neutral ? '→' : up ? '↑' : '↓';
+  const arrowClass = neutral ? 'drift-neutral' : up ? 'drift-up' : 'drift-down';
+  const changeClass = neutral ? 'drift-change-neutral' : up ? 'drift-change-up' : 'drift-change-down';
+  const changeText = neutral ? '—' : up ? `+${t.change}` : `${t.change}`;
+  const ins = t.insights;
+  const badgeClass = ins.discovery === 'Recent discovery' ? 'badge-recent' :
+                     ins.discovery === 'Long-term favourite' ? 'badge-longterm' :
+                     ins.discovery === 'Fading from rotation' ? 'badge-fading' : 'badge-deep';
+  return `
+    <li class="drift-item">
+      <div class="drift-tooltip">
+        <div class="tooltip-title">${t.artist}</div>
+        <div class="tooltip-row">
+          <span class="tooltip-label">Best rank</span>
+          <span class="tooltip-value">#${ins.best_rank}</span>
+        </div>
+        <div class="tooltip-row">
+          <span class="tooltip-label">Total appearances</span>
+          <span class="tooltip-value">${ins.appearances}</span>
+        </div>
+        <div class="tooltip-row">
+          <span class="tooltip-label">Strongest in</span>
+          <span class="tooltip-value">${ins.dominant}</span>
+        </div>
+        <div class="tooltip-row">
+          <span class="tooltip-label">Last 4 weeks</span>
+          <span class="tooltip-value">${ins.short_count} track${ins.short_count !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="tooltip-row">
+          <span class="tooltip-label">Last 6 months</span>
+          <span class="tooltip-value">${ins.medium_count} track${ins.medium_count !== 1 ? 's' : ''}</span>
+        </div>
+        <span class="tooltip-badge ${badgeClass}">${ins.discovery}</span>
+      </div>
+      ${t.album_image
+        ? `<img src="${t.album_image}" style="width:44px;height:44px;border-radius:4px;object-fit:cover;flex-shrink:0;">`
+        : `<div style="width:44px;height:44px;border-radius:4px;background:#282828;flex-shrink:0;"></div>`}
+      <div class="track-info" style="flex:1;min-width:0;">
+        <div class="name">${t.artist}</div>
+        <div class="artist">${up ? 'Rising' : neutral ? 'Stable' : 'Falling'}</div>
+      </div>
+      <span class="drift-arrow ${arrowClass}">${arrow}</span>
+      <span class="drift-change ${changeClass}">${changeText}</span>
+    </li>`;
+}).join('');
+
+    document.getElementById('top10').innerHTML = d.top10.map((t,i) => `
+  <li>
+    <span class="rank">${i+1}</span>
+    <a href="https://open.spotify.com/track/${t.track_id}" target="_blank" style="display:flex;align-items:center;gap:12px;flex:1;text-decoration:none;color:inherit;border-radius:6px;padding:2px;transition:opacity 0.15s;">
+      ${t.album_image
+        ? `<img src="${t.album_image}" style="width:44px;height:44px;border-radius:4px;object-fit:cover;flex-shrink:0;">`
+        : `<div style="width:44px;height:44px;border-radius:4px;background:#282828;flex-shrink:0;"></div>`}
+      <div class="track-info" style="min-width:0;">
+        <div class="name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.track_name}</div>
+        <div class="artist">${t.artist}</div>
+      </div>
+    </a>
+    <a href="https://open.spotify.com/track/${t.track_id}" target="_blank" style="color:#1DB954;font-size:11px;font-weight:700;text-decoration:none;opacity:0.7;white-space:nowrap;margin-left:8px;">▶ Play</a>
+  </li>`).join('');
+
+    document.getElementById('scored').innerHTML = d.top_scored.map(t => `
+  <li>
+    <a href="https://open.spotify.com/track/${t.track_id}" target="_blank" style="display:flex;align-items:center;gap:12px;flex:1;text-decoration:none;color:inherit;border-radius:6px;padding:2px;transition:opacity 0.15s;">
+      ${t.album_image
+        ? `<img src="${t.album_image}" style="width:44px;height:44px;border-radius:4px;object-fit:cover;flex-shrink:0;">`
+        : `<div style="width:44px;height:44px;border-radius:4px;background:#282828;flex-shrink:0;"></div>`}
+      <div class="track-info" style="min-width:0;">
+        <div class="name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.track_name}</div>
+        <div class="artist">${t.artist}</div>
+      </div>
+    </a>
+    <span class="score-pill">${t.taste_score}</span>
+  </li>`).join('');
+  }
+
+  async function refreshData() {
+    document.getElementById('status').textContent = 'Refreshing...';
+    const res = await fetch('/api/refresh');
+    const data = await res.json();
+    if (data.status === 'success') {
+      document.getElementById('status').textContent = '✓ Refreshed';
+      loadDashboard();
+      setTimeout(() => document.getElementById('status').textContent = '', 3000);
+    }
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>
