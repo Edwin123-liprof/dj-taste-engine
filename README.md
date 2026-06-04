@@ -1,6 +1,6 @@
 # DJ Taste Engine 🎵
 
-A personal music intelligence engine that analyzes your Spotify listening history to model your shifting taste over time and generate contextually smart, DJ-style track queues tailored to your current mood and listening context.
+A personal music intelligence engine that analyzes your Spotify listening history to model your shifting taste over time and generates contextually smart, DJ-style track queues — served through a full web application.
 
 ## The Problem
 
@@ -10,33 +10,55 @@ Spotify's DJ feature replays familiar songs without adapting to how your taste s
 
 DJ Taste Engine pulls your real Spotify data across three time windows (last 4 weeks, 6 months, all time) and scores every track using a weighted model that prioritizes recency and current preference. It then generates a 20-track queue structured like a real DJ set — warmup, build, peak, cooldown — using your highest-scoring tracks at the right moments.
 
+## Web Application
+
+The project ships as a local web app with three pages:
+
+- **Homepage** — animated hero with live audio visualizer, scrolling track ticker, top 10 tracks with album art, and feature navigation
+- **Dashboard** — listening pattern charts, taste drift infographic with hover insights, top 10 and top scored tracks with album art and Spotify links
+- **DJ Queue** — on-demand queue generation with phase badges, taste scores, album art, and direct Spotify playback links
+
 ## Features
 
-- Spotify OAuth authentication via the Spotipy library
+- Spotify OAuth authentication via Spotipy
 - Pulls recently played tracks and top tracks across three time windows
+- Album artwork fetched and displayed throughout the app
 - Weighted taste scoring model with recency decay
 - DJ-style energy arc queue generation
-- Listening pattern visualizations (most played artists, hour of day, day of week, taste drift)
+- Listening pattern visualizations (artists, hour of day, day of week)
+- Taste drift infographic with artist insights on hover
+- One-click Spotify playback links for every track
+- Refresh button to pull latest Spotify data on demand
+- Live canvas audio visualizer background on homepage
 
 ## Tech Stack
 
 - Python 3
+- Flask
 - Spotipy (Spotify Web API wrapper)
 - Pandas
 - Scikit-learn
-- Matplotlib
+- Chart.js
+- Lucide Icons
+- HTML / CSS / JavaScript
 
 ## Project Structure
 
 ```
 dj-taste-engine/
+├── app.py                # Flask web application
 ├── collect_data.py       # Spotify API data collection
-├── explore.py            # Listening pattern visualizations
+├── explore.py            # Standalone visualizations
 ├── recommender.py        # Taste scoring + DJ queue generation
+├── templates/
+│   ├── index.html        # Homepage
+│   ├── dashboard.html    # Taste dashboard
+│   └── queue.html        # DJ queue page
+├── static/
+│   └── logo.png          # App logo
 ├── recent_tracks.csv     # Recently played tracks (generated)
 ├── top_tracks.csv        # Top tracks across time windows (generated)
 ├── dj_queue.csv          # Generated DJ queue (generated)
-├── taste_profile.png     # Visualization output (generated)
 └── requirements.txt      # Dependencies
 ```
 
@@ -63,17 +85,13 @@ SPOTIPY_REDIRECT_URI=http://127.0.0.1:8888/callback
 python collect_data.py
 ```
 
-5. Generate your DJ queue:
+5. Start the web app:
 
 ```bash
-python recommender.py
+python app.py
 ```
 
-6. Visualize your taste profile:
-
-```bash
-python explore.py
-```
+6. Open your browser at `http://127.0.0.1:5000`
 
 ## How the Model Works
 
@@ -83,21 +101,7 @@ Each track is scored using a combination of:
 - **Rank weight** — rank 1 scores 1.0, rank 50 scores 0.02
 - **Recency bonus** — tracks played recently get a bonus that decays over 7 days
 
-The DJ queue then slots your highest-scoring tracks into the peak phase of an energy arc, with lower-scored tracks filling the warmup and cooldown phases.
-
-## Sample Output
-
-```
-#    Phase      Track                               Artist                    Score
-------------------------------------------------------------------------------------
-1    warmup     News or Something                   Future                    2.50
-2    warmup     White Iverson                       Post Malone               2.40
-...
-11   peak       YUKON                               Justin Bieber             3.68
-14   peak       Ballin' (with Roddy Ricch)          Mustard                   4.07
-...
-20   cooldown   Nuvole Bianche                      Ludovico Einaudi          2.04
-```
+The DJ queue slots your highest-scoring tracks into the peak phase of an energy arc, with lower-scored tracks filling the warmup and cooldown phases.
 
 ## Author
 
