@@ -2,8 +2,6 @@ from flask import Flask, render_template, jsonify
 import pandas as pd
 import numpy as np
 from datetime import datetime, timezone
-import subprocess
-import os
 
 app = Flask(__name__)
 
@@ -179,13 +177,23 @@ def queue():
     q = generate_queue(df_scored)
     return jsonify(q)
 
+@app.route('/api/auth-status')
+def auth_status():
+    from spotify_client import get_session_status
+    return jsonify(get_session_status())
+
 @app.route('/api/refresh')
 def refresh():
     try:
-        subprocess.run(['python', 'collect_data.py'], check=True, capture_output=True)
+        from collect_data import collect
+        from spotify_client import ReauthRequired
+        collect()
         return jsonify({'status': 'success', 'message': 'Data refreshed successfully'})
-    except subprocess.CalledProcessError as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+    except ReauthRequired as e:
+        return jsonify({'status': 'reauth_required', 'message': str(e)}), 401
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/dashboard')
 def dashboard_page():
     return render_template('dashboard.html')

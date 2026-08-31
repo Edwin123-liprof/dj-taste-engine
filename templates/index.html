@@ -484,6 +484,7 @@
       transition: opacity 0.3s;
     }
     .refresh-status.show { opacity: 1; }
+    .refresh-status.error { color: #f87171; max-width: 280px; text-align: right; line-height: 1.4; }
   </style>
 </head>
 <body>
@@ -676,21 +677,45 @@ document.getElementById('tracks-grid').innerHTML = top10.map((t) => `
     document.getElementById('ticker-track').innerHTML = items + items;
   }
 
+  function showRefreshStatus(message, isError) {
+    const status = document.getElementById('refresh-status');
+    status.textContent = message;
+    status.classList.toggle('error', Boolean(isError));
+    status.classList.add('show');
+  }
+
   async function refreshData() {
     const btn = document.getElementById('refresh-btn');
-    const status = document.getElementById('refresh-status');
     btn.classList.add('loading');
-    const res = await fetch('/api/refresh');
-    const data = await res.json();
-    btn.classList.remove('loading');
-    if (data.status === 'success') {
-      status.classList.add('show');
-      setTimeout(() => status.classList.remove('show'), 3000);
-      loadHome();
+    showRefreshStatus('Refreshing… complete Spotify sign-in if a login window appears.', false);
+    try {
+      const res = await fetch('/api/refresh');
+      const data = await res.json();
+      if (data.status === 'success') {
+        showRefreshStatus('✓ Data refreshed', false);
+        loadHome();
+        setTimeout(() => document.getElementById('refresh-status').classList.remove('show'), 3000);
+      } else {
+        showRefreshStatus(data.message || 'Refresh failed', true);
+      }
+    } catch (e) {
+      showRefreshStatus('Refresh failed. Try again, or run python collect_data.py to sign in.', true);
     }
+    btn.classList.remove('loading');
+  }
+
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/auth-status');
+      const data = await res.json();
+      if (!data.ok && data.reason === 'refresh_token_expired') {
+        showRefreshStatus('Spotify login expired (refresh tokens last 6 months). Click Refresh Data to sign in again.', true);
+      }
+    } catch (e) {}
   }
 
   loadHome();
+  checkAuth();
   // Live audio visualizer background
 const canvas = document.getElementById('visualizer');
 const ctx = canvas.getContext('2d');

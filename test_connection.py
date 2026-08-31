@@ -1,13 +1,6 @@
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv
+from spotify_client import get_spotify_client
 
-load_dotenv()
-
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-    scope="user-read-recently-played user-top-read user-library-read",
-    cache_path=".cache"
-))
+sp = get_spotify_client()
 
 results = sp.current_user_recently_played(limit=5)
 for item in results['items']:
